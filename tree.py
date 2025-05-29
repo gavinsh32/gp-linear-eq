@@ -10,9 +10,14 @@ class NODE_TYPE(Enum):
     VAR = 2
 
 class Node:
-    def __init__(self):
+    def __init__(self, depth) -> None:
+        """Generic node template."""
+        self.depth = depth
         self.left_child = None
         self.right_child = None
+
+    def __str__(self):
+        return 'd' + str(self.depth)
 
 class OP_TYPE(Enum):
     """
@@ -24,61 +29,69 @@ class OP_TYPE(Enum):
     DIV = 3
 
 class Operator(Node):
-    def __init__(self, kind = OP_TYPE.ADD):
+    def __init__(self, kind: OP_TYPE, depth: int):
         """
         Spawn a new Operator node to represent an operation in the tree.
         """
-        super().__init__()
+        super().__init__(depth)
         self.kind = kind
 
     def __str__(self):
+        txt = ''
         match self.kind:
             case OP_TYPE.ADD:
-                return 'Add'
+                txt = 'Add'
             case OP_TYPE.SUB:
-                return 'Subtract'
+                txt = 'Subtract'
             case OP_TYPE.MUL:
-                return 'Multiply'
+                txt = 'Multiply'
             case OP_TYPE.DIV:
-                return 'Divide'
+                txt = 'Divide'
             case _:
-                return ''
+                txt = 'INVALID_OP'
+        return f'{txt} {super().__str__()}'
 
 class Constant(Node):
     """A node with an integer value."""
-    def __init__(self, data = 0):
-        super().__init__()
+    def __init__(self, data: int, depth: int):
+        super().__init__(depth)
         self.data = data
 
     def __str__(self):
-        return str(self.data)
+        return f'{self.data} {super().__str__()}'
 
 class Variable(Node):
     """A node with the number of the variable it represents (x0, x1, ..., xn)."""
-    def __init__(self, id = 0):
+    def __init__(self, id: int, depth: int):
         """Spawn a new variable node with the id it represents."""
-        super().__init__()
+        super().__init__(depth)
         self.id = id
 
     def __str__(self):
-        return f'x{self.id}'
+        return f'x{self.id} {super().__str__()}'
 
 class Individual:
-    def __init__(self, max_depth=4):
+    def __init__(self, depth=4):
         """
         Create an individual, which is a binary tree representing a potential solution in linear regression. Solutions are generated randomly given only a maximum depth.
         """
-        pass
+        self.depth = depth
+
+    def generate(self) -> Node:
+        for _ in range(1):
+            pass
+        return Node(0)
 
     def evalutate(self) -> float:
         return 0.0
-    
+
 def show(individual: Individual):
+    """Print an individual"""
     pass
 
-ex_op = Operator(OP_TYPE.DIV)
-ex_var = Variable(0)
-ex_const = Constant(2)
+ex_op = Operator(OP_TYPE.DIV, 0)
+ex_var = Variable(0, 0)
+ex_const = Constant(2, 0)
 
 print(ex_op)
 print(ex_var)
