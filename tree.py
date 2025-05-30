@@ -5,7 +5,9 @@ from enum import Enum
 def main():
     ex_indiv = Individual(3)
     ex_indiv.show()
-
+    inputs = [random.randint(CONST_MIN, CONST_MAX) for _ in range(NUM_VARS)]
+    print(ex_indiv.evalutate(inputs))
+    
 class Node:
     def __init__(self, depth) -> None:
         """Generic node template."""
@@ -105,7 +107,10 @@ class Individual:
 
         return new_node
 
-    def evalutate(self) -> float:
+    def evalutate(self, input_values=[]) -> float:
+        if len(input_values) != NUM_VARS - 1:
+            print('EVAL ERROR: recieved input of len', len(input_values), 'instead of', NUM_VARS)
+            return -1.0
         return 0.0
     
     def show(self, starting_node: Node | None = None, curr_depth = 0):
