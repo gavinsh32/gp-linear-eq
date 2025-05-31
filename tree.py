@@ -1,80 +1,59 @@
 # tree.py
 import random
 from enum import Enum
+from typing import Union, TypeAlias
 
 def main():
     ex_indiv = Individual(3)
-    ex_indiv.show()
-    inputs = [random.randint(CONST_MIN, CONST_MAX) for _ in range(NUM_VARS)]
-    print(ex_indiv.evalutate(inputs))
+    inputs = [_generate_value() for _ in range(NUM_VARS)]
+    ex_indiv.display()
+    print(ex_indiv.evalutate(inputs))   
+
+def _generate_value():
+    return [random.random() * CONST_RANGE - 1.0 - CONST_RANGE]
+
+class Operator():
+    def __init__(self):
+        self.kind: int = random.randint(0, 3)
     
-class Node:
-    def __init__(self, depth) -> None:
-        """Generic node template."""
-        self.depth = depth
-        self.left_child: Node | None = None
-        self.right_child: Node | None = None
+    def get(self) -> int:
+        return self.kind
+    
+    def __str__(self):
+        return str(self.kind)
+
+# Variable Node
+NUM_VARS = 4
+
+class Variable():
+    """A node with the number of the variable it represents (x0, x1, ..., xn)."""
+    def __init__(self):
+        """Spawn a new variable node with the id it represents."""
+        self.id: int = random.randrange(NUM_VARS)
+
+    def get(self) -> int:
+        return self.id
 
     def __str__(self):
-        return 'd' + str(self.depth)
+        return f'x{self.id} {super().__str__()}'
 
-class OP_TYPE(Enum):
-    """
-    Kinds of operators: Add, Subtract, Multiply, and Divide.
-    """
-    ADD = 0
-    SUB = 1
-    MUL = 2
-    DIV = 3
+CONST_RANGE = 2.0
 
-class Operator(Node):
-    def __init__(self, depth: int):
-        """
-        Spawn a new Operator node to represent an operation in the tree.
-        """
-        super().__init__(depth)
-        self.kind = random.choice(list(OP_TYPE))
+class Constant():
+    """A node with an float value."""
+    def __init__(self):
+        self.data: float = random.random() * CONST_RANGE - 1.0 - CONST_RANGE
 
-    def __str__(self):
-        txt = ''
-        match self.kind:
-            case OP_TYPE.ADD:
-                txt = 'Add'
-            case OP_TYPE.SUB:
-                txt = 'Subtract'
-            case OP_TYPE.MUL:
-                txt = 'Multiply'
-            case OP_TYPE.DIV:
-                txt = 'Divide'
-            case _:
-                txt = 'INVALID_OP'
-        return f'{txt} {super().__str__()}'
-
-# Constant Node
-CONST_MIN = -16
-CONST_MAX = 16
-class Constant(Node):
-    """A node with an integer value."""
-    def __init__(self, depth: int):
-        super().__init__(depth)
-        self.data = random.randint(CONST_MIN, CONST_MAX)
+    def get(self) -> float:
+        return self.data
 
     def __str__(self):
         return f'{self.data} {super().__str__()}'
 
-# Variable Node
-NUM_VARS = 4
-class Variable(Node):
-    """A node with the number of the variable it represents (x0, x1, ..., xn)."""
-    def __init__(self, depth: int):
-        """Spawn a new variable node with the id it represents."""
-        super().__init__(depth)
-        self.id = random.randrange(NUM_VARS)
+Node = Operator
+Terminal: TypeAlias = Union[Constant, Variable]
 
-    def __str__(self):
-        return f'x{self.id} {super().__str__()}'
-    
-NODE_TYPES = [Operator, Constant, Variable]
+AnyNode: TypeAlias = Node | Terminal
 
 # Individual, Tree
 class Individual:
@@ -86,51 +65,42 @@ class Individual:
         self.max_depth = max_depth
         self.root = self._generate()
 
-    def _generate(self, _starting_depth=0) -> Node | None:
-        """Recursively and randomly generate a tree no larger than self.depth."""
+    def _generate(self, _depth=0) -> AnyNode | None:
+        """Generate a random tree no greater than max_depth."""
 
-        # Terminal node, must be a constant or variable.
-        if _starting_depth >= self.max_depth - 1:
-            if random.randint(0, 1) == 0:
-                return Constant(_starting_depth)
-            else:
-                return Variable(_starting_depth)
-
-        # Generate a new node
-        new_node = random.choice(NODE_TYPES)(_starting_depth)
-
-        if random.random() <= 0.8:
-            new_node.left_child = self._generate(_starting_depth + 1)
+        # Base case, return a terminal node.
+        if _depth >= self.max_depth:
+            return random.choice([Constant, Variable])()
         
-        if random.random() <= 0.8:
-            new_node.right_child = self._generate(_starting_depth + 1)
+        # Create new node to be entered.
+        entry: AnyNode | None = None
+        if _depth == 0: # Ensure tree doesn't terminal at root
+            entry = Operator()
+        else:
+            entry = random.choice([Operator, Constant, Variable])()
+        
+        # Recursive case
+        if entry is Operator:
+            entry.left_child = self._generate()
+            entry.right_child = self._generate()
 
-        return new_node
+        return entry
 
     def evalutate(self, input_values=[]) -> float:
-        if len(input_values) != NUM_VARS - 1:
+        if len(input_values) != NUM_VARS:
             print('EVAL ERROR: recieved input of len', len(input_values), 'instead of', NUM_VARS)
             return -1.0
         return 0.0
     
-    def show(self, starting_node: Node | None = None, curr_depth = 0):
-        """Recursively print the tree structure."""
-        
-        if starting_node is None:
-            starting_node = self.root
-        
-        if starting_node is None:
-            print("(empty tree)")
-            return
-        
-        spacing = '|  ' * curr_depth if curr_depth > 0 else ''
-        print(spacing + str(starting_node))
+    def display(self, indent='| ', _curr: AnyNode | None = None, _depth = 0):
+        if _curr is None and _depth == 0:
+            _curr = self.root
 
-        if starting_node.right_child is not None:
-            self.show(starting_node.right_child, curr_depth + 1)
-        
-        if starting_node.left_child is not None:
-            self.show(starting_node.left_child, curr_depth + 1)
+        if _curr is Operator:
+            self.display(indent, _curr.right_child, _depth + 1)
+            self.display(indent, _curr.left_child, _depth + 1)
+
+        print(indent * _depth + str(_curr))
 
 if __name__ == '__main__':
     main()
