@@ -145,8 +145,8 @@ class Individual:
                     return left_total - right_total
                 case 2:
                     return left_total * right_total
-                case 3:
-                    return left_total / right_total
+                case 3: 
+                    return left_total / right_total if right_total > 0.0 else 0.0
                 case _:
                     return -1.0
 
@@ -159,7 +159,7 @@ class Individual:
         return total
     
     def display(self, indent='|  ', _curr: AnyNode | None = None, _depth = 0):
-        
+        """Display as a tree structure."""
         if _curr is None and _depth == 0:
             _curr = self.root 
 
@@ -169,5 +169,18 @@ class Individual:
             self.display(indent, _curr.right_child, _depth + 1)
             self.display(indent, _curr.left_child, _depth + 1)
 
+class Population:
+    def __init__(self, max_depth: int, psize=20):
+        self.members = [Individual(3) for _ in range(psize)]
+
+    def display(self):
+        """Display all trees."""
+        for member in self.members:
+            member.display()
+            print()
+
+    def __len__(self):
+        return len(self.members)
+    
 if __name__ == '__main__':
     main()
