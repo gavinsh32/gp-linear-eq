@@ -1,4 +1,5 @@
-# tree.py
+# population.py
+
 import random
 from individual import Individual
 
@@ -13,7 +14,8 @@ class Population:
         self.size = size
         self.members = [Individual(max_depth) for _ in range(self.size // 2)]
         self.members = [Individual(max_depth // 2) for _ in range(self.size // 2)]
-        self.metrics = self.calculate_metrics()
+        self.metrics = {}
+        self.calculate_metrics()
 
     def evaluate(self, input_values: list[float], expected_output: float):
         """
@@ -21,12 +23,13 @@ class Population:
         """
         for member in self.members:
             member.fitness = abs(member.evalutate(input_values) - expected_output)
+        
         self.calculate_metrics()
 
-    def crossover(self, parent1: Individual, parent2: Individual):
+    def crossover(self, parent1: Individual, parent2: Individual) -> Individual:
         return Individual(parent1.initial_depth)
 
-    def evolve(self, num_parents=4):
+    def evolve(self, num_parents=4) -> None:
         """
         Select fit parents, reproduce with crossover and mutation, to form the next generation.
         """
@@ -59,7 +62,7 @@ class Population:
 
         return self.members[winner_index]
     
-    def calculate_metrics(self):
+    def calculate_metrics(self) -> None:
         """Calculates the average and best fitness / individual in this population."""
         avg_fit = 0.0   # Average fitness
         low_fit = 9999 # Highest fitness
@@ -74,7 +77,7 @@ class Population:
                 best_ind = member
 
         avg_fit /= self.size
-        return {
+        self.metrics = {
             'avg': avg_fit,
             'lowest': low_fit,
             'best': best_ind

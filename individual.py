@@ -1,3 +1,5 @@
+# individual.py
+
 import random                       
 from typing import Union, TypeAlias         # Make aliases of node types for clarity.
 
