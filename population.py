@@ -21,7 +21,6 @@ class Population:
         """
         for member in self.members:
             member.fitness = abs(member.evalutate(input_values) - expected_output)
-            print(member.fitness)
         self.calculate_metrics()
 
     def crossover(self, parent1: Individual, parent2: Individual):

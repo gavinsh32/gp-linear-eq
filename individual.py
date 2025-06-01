@@ -1,11 +1,19 @@
 import random                       
 from typing import Union, TypeAlias         # Make aliases of node types for clarity.
 
+# Variable Node Constants
 NUM_VARS = 4
+
+# Constant Node Constants
 CONST_RANGE = 2.0
 
-def _generate_value():
-    return 0.0
+def generate_value():
+    """Generate a float in the range [-CONST_RANGE, CONST_RANGE]."""
+    return float(random.random() * CONST_RANGE * 2 - CONST_RANGE)
+
+def generate_list():
+    """Generate a list of size NUM_VARS of floats [-CONST_RANGE, CONST_RANGE]."""
+    return [generate_value() for _ in range(NUM_VARS)]
 
 class Operator():
     def __init__(self):
@@ -56,7 +64,7 @@ class Variable():
 class Constant():
     """A node with an float value."""
     def __init__(self):
-        self.data: float = _generate_value()
+        self.data: float = generate_value()
 
     def get(self) -> float:
         return self.data
@@ -65,7 +73,7 @@ class Constant():
         return f'{self.data}'
     
     def copy(self) -> 'Constant':
-        dst = Constant(0.0)
+        dst = Constant()
         dst.data = self.data
         return dst
 
