@@ -120,8 +120,7 @@ class Individual:
 
         return entry
 
-    def evalutate(self, input_values=[], _curr: AnyNode | None = None, 
-                  _depth = 0) -> float:
+    def evalutate(self, input_values=[], _curr: AnyNode | None = None, _depth = 0) -> float:
         """Evaluate this tree expression on input_values."""
         
         # Check that there are the same number of input variables available for nodes and read in as input.
