@@ -68,13 +68,13 @@ class Population:
         low_fit = 9999 # Highest fitness
         best_ind = 0    # Index of the best individual in population
         
-        for member in self.members:
+        for i, member in enumerate(self.members):
             fit = member.fitness
             avg_fit += fit
 
             if fit < low_fit:
                 low_fit = fit
-                best_ind = member
+                best_ind = i
 
         avg_fit /= self.size
         self.metrics = {
@@ -83,11 +83,17 @@ class Population:
             'best': best_ind
         }
 
+    def get_best(self):
+        """Return a reference to the most fit individual in this population."""
+        return self.members[self.metrics['best']]
+
     def display(self):
         """Display all trees."""
-        for member in self.members:
+        for i, member in enumerate(self.members):
+            if i == self.metrics['best']:
+                print('Best Individual:')
             member.display()
-            print()
+            print('Error:', member.fitness, '\n')
 
     def __len__(self):
         return len(self.members)

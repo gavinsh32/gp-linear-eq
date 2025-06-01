@@ -22,7 +22,8 @@ def main():
     # Instantiate a population and begin regression.
     pop = Population(4, 32)
     pop.evaluate(inputs, expected_output)
-    print('Average error:', pop.metrics['avg'])
+    print('Average error:', pop.metrics['avg'], '\n')
+    pop.display()
 
 if __name__ == '__main__':
     main()
